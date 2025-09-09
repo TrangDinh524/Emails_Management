@@ -13,6 +13,14 @@
     <ul>
         @foreach ($emails as $email)
             <li>{{ $email->email }}</li>
+            <a href="{{ route('emails.show', $email->id) }}">View</a>
+
+            <form action="{{ route('emails.destroy', $email->id) }}" method="POST" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+            </form>
+
         @endforeach
     </ul>
    
