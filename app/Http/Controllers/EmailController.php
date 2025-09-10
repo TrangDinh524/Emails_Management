@@ -32,7 +32,7 @@ class EmailController extends Controller
 
     public function index()
     {
-        $emails = Email::whereNull('deleted_at')->simplePaginate(5);
+        $emails = Email::whereNull('deleted_at')->paginate(10);
         return view('emails.index', compact('emails'));
     }
     public function show($id)

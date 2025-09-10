@@ -38,7 +38,7 @@
                     <tbody>
                         @foreach($emails as $index=>$email)
                             <tr>
-                                <td>{{$index+1}}</td>
+                                <td>{{ ($emails->currentPage() - 1) * $emails->perPage() + $index + 1 }}</td>
                                 <td>{{$email->email}}</td>
                                 <td>
                                     <a href="{{ route('emails.show', $email->id) }}" class="btn btn-view">View</a>
