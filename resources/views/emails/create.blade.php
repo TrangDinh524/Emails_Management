@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
+    <!-- <meta charset="UTF-8"> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Email</title>
-    @vite(['resources/css/app.css'])
+    @vite(['resources/js/app.js'])
 </head>
 <body>
-<div class="login-container">
+    <div class="login-container">
         <div class="login-header">
             <h1>Add New Email</h1>
             <p>Enter an email address to add to your collection</p>
@@ -44,7 +44,7 @@
         </form>
 
         <a href="{{ route('emails.index') }}" class="back-link">
-            ← Back to Email List
+            Back to Email List
         </a>
     </div>
 </body>
