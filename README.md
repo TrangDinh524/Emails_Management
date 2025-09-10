@@ -1,61 +1,202 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Email Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A simple and elegant Laravel application for managing email addresses with full CRUD operations and soft delete functionality.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   ✅ **Add Email Addresses**: Create and store email addresses with validation
+-   ✅ **View Email List**: Browse all stored emails with pagination (5 emails per page)
+-   ✅ **View Individual Email**: See details of a specific email
+-   ✅ **Delete Emails**: Soft delete functionality to remove emails
+-   ✅ **Email Validation**: Ensures unique email addresses (excluding soft-deleted ones)
+-   ✅ **Responsive Design**: Clean and modern UI with CSS styling
+-   ✅ **Pagination**: Efficient browsing through large email lists
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Technology Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+-   **Backend**: Laravel 12.x
+-   **Frontend**: Blade templates with custom CSS
+-   **Database**: SQLite (default) / MySQL / PostgreSQL
+-   **PHP Version**: 8.2+
+-   **Features**: Soft Deletes, Form Validation, Pagination
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Prerequisites
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+-   PHP 8.2 or higher
+-   Composer
+-   Node.js and NPM (for frontend assets)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Setup Instructions
 
-## Laravel Sponsors
+1. **Clone the repository**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+    ```bash
+    git clone <repository-url>
+    cd Emails_Management
+    ```
 
-### Premium Partners
+2. **Install PHP dependencies**
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+    ```bash
+    composer install
+    ```
+
+3. **Install Node.js dependencies**
+
+    ```bash
+    npm install
+    ```
+
+4. **Environment setup**
+
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
+
+5. **Database setup**
+
+    ```bash
+    # For SQLite (default)
+    touch database/database.sqlite
+
+    # Or configure MySQL/PostgreSQL in .env file
+    ```
+
+6. **Run migrations**
+
+    ```bash
+    php artisan migrate
+    ```
+
+7. **Build frontend assets**
+
+    ```bash
+    npm run build
+    # or for development
+    npm run dev
+    ```
+
+8. **Start the development server**
+
+    ```bash
+    php artisan serve
+    ```
+
+    The application will be available at `http://localhost:8000`
+
+## Usage
+
+### Available Routes
+
+| Method | URI            | Action  | Description                 |
+| ------ | -------------- | ------- | --------------------------- |
+| GET    | `/`            | create  | Show email creation form    |
+| POST   | `/store`       | store   | Store new email address     |
+| GET    | `/emails`      | index   | List all emails (paginated) |
+| GET    | `/emails/{id}` | show    | View specific email details |
+| DELETE | `/emails/{id}` | destroy | Soft delete an email        |
+
+### Key Features
+
+#### Email Validation
+
+-   Email format validation
+-   Unique email constraint (excluding soft-deleted emails)
+-   Allows re-adding previously deleted emails
+
+#### Soft Delete
+
+-   Emails are not permanently removed from database
+-   Uses Laravel's SoftDeletes trait
+-   Deleted emails can be restored if needed
+
+#### Pagination
+
+-   Displays 5 emails per page
+-   Laravel's built-in pagination links
+-   Efficient for large email collections
+
+## Database Schema
+
+### Emails Table
+
+```sql
+- id (Primary Key)
+- email (String)
+- deleted_at (Timestamp, nullable) - for soft deletes
+- created_at (Timestamp)
+- updated_at (Timestamp)
+```
+
+## Project Structure
+
+```
+Emails_Management/
+├── app/
+│   ├── Http/Controllers/
+│   │   └── EmailController.php      # Main controller for email operations
+│   └── Models/
+│       └── Email.php                # Email model with soft deletes
+├── database/
+│   └── migrations/
+│       └── 2025_09_09_091822_create_emails_table.php
+├── resources/
+│   ├── views/emails/
+│   │   ├── create.blade.php         # Email creation form
+│   │   ├── index.blade.php          # Email listing page
+│   │   └── show.blade.php           # Email details page
+│   └── css/
+│       └── app.css                  # Custom styling
+└── routes/
+    └── web.php                      # Application routes
+```
+
+## Development
+
+### Running Tests
+
+```bash
+php artisan test
+```
+
+### Code Style
+
+```bash
+./vendor/bin/pint
+```
+
+### Development Mode
+
+```bash
+composer run dev
+```
+
+This command runs:
+
+-   Laravel development server
+-   Queue worker
+-   Log viewer (Pail)
+-   Vite development server
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Support
+
+If you encounter any issues or have questions, please open an issue in the repository.
+
+---
+
+**Built with ❤️ using Laravel**
