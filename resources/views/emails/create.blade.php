@@ -1,25 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Submit Email</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Email</title>
+    @vite(['resources/css/app.css'])
 </head>
 <body>
-    <h1>Enter Email</h1>
-
-    @if ($errors->any())
-        <div style="color:red;">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+<div class="login-container">
+        <div class="login-header">
+            <h1>Add New Email</h1>
+            <p>Enter an email address to add to your collection</p>
         </div>
-    @endif
 
-    <form method="POST" action="{{ route('emails.store') }}">
-        @csrf
-        <input type="email" name="email" placeholder="Enter email" required>
-       <button type="submit">Submit</button>
-    </form>
+        @if ($errors->any())
+            <div class="error-container">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('emails.store') }}">
+            @csrf
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email"
+                    name="email" 
+                    class="form-input"
+                    placeholder="Enter email address" 
+                    required
+                    value="{{ old('email') }}"
+                >
+            </div>
+            
+            <button type="submit" class="submit-btn">
+                Add Email
+            </button>
+        </form>
+
+        <a href="{{ route('emails.index') }}" class="back-link">
+            ← Back to Email List
+        </a>
+    </div>
 </body>
 </html>
