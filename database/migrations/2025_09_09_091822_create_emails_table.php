@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('emails', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->unique();
+            // $table->string('email')->unique();
+            $table->string('email'); // remove ->unique() so thats after delete, we can add agian the email
+            # Then, manually enforce uniqueness only on non-deleted records via Email Controller.
+
             $table->softDeletes(); // for soft delete
             $table->timestamps();
         });

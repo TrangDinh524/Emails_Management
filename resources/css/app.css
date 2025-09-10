@@ -1,16 +1,3 @@
-@import "tailwindcss";
-
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
-
-@theme {
-    --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
-        "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-        "Noto Color Emoji";
-}
-
 * {
     margin: 0;
     padding: 0;
@@ -19,17 +6,13 @@
 
 body {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
-    padding: 20px;
 }
 
 /* Container Styles */
 .container {
-    max-width: 1200px;
     margin: 0 auto;
     background: white;
-    border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
@@ -70,7 +53,7 @@ body {
     width: 100%;
     max-width: 400px;
     text-align: center;
-    margin: 0 auto;
+    margin: 40px auto;
 }
 
 .login-header {
@@ -114,7 +97,7 @@ body {
 
 .form-input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #2a4ff7;
     background: white;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -131,7 +114,6 @@ body {
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
 }
 
 .btn-large {
@@ -195,16 +177,6 @@ body {
 
 .btn-view:hover {
     background: #218838;
-    transform: translateY(-1px);
-}
-
-.btn-delete {
-    background: #dc3545;
-    color: white;
-}
-
-.btn-delete:hover {
-    background: #c82333;
     transform: translateY(-1px);
 }
 
@@ -273,6 +245,56 @@ body {
 }
 
 .error-container li:before {
-    content: "âš  ";
+    /* content: "âš? "; */
     margin-right: 5px;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    margin-top: 20px;
+}
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    color: #333;
+}
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+#emails-table th,
+#emails-table td {
+    text-align: center;
+}
+
+#emails-table th:nth-child(2),
+#emails-table td:nth-child(2) {
+    text-align: left
+}
+
+#details-table th, td {
+    text-align: left;
+}
+
+.detail-actions{
+    margin-top: 10px;
+    display: flex;
+    gap: 15px;
+    justify-content: right;
+}
+.empty-list {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+.empty-list h3{
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
 }
