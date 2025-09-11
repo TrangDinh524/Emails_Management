@@ -5,6 +5,8 @@
   --deep-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
+  --color-white: #f8f9fa;
+  --color-light-grey: #6c757d;
 
 }
 
@@ -102,7 +104,7 @@ body {
     border-radius: 10px;
     font-size: 16px;
     transition: all 0.3s ease;
-    background: #f8f9fa;
+    background: var(--color-white);
 }
 
 .form-input:focus {
@@ -161,7 +163,7 @@ body {
 }
 
 .btn-secondary {
-    background: #6c757d;
+    background: var( --color-light-grey);
     color: white;
 }
 
@@ -270,7 +272,7 @@ th, td {
     border-bottom: 1px solid #ddd;
 }
 th {
-    background-color: #f8f9fa;
+    background-color: var(--color-white);
     font-weight: bold;
     color: #333;
 }
@@ -361,8 +363,31 @@ tr:hover {
 }
 
 .pagination .disabled span {
-    color: #6c757d;
-    background-color: #f8f9fa;
+    color: var( --color-light-grey);
+    background-color: var(--color-white);
     cursor: not-allowed;
     border: 2px solid #e9ecef;
+}
+
+/* Email-Content */
+.email-header {
+    background-color: var(--color-white);
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.email-content {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;  
+}
+
+.email-footer {
+    padding: 10px;
+    margin-top: 20px;
+    font-size: 12px;
+    color: var( --color-light-grey);
+    text-align: center;
 }
