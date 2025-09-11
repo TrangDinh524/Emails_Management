@@ -60,7 +60,7 @@
                             placeholder="Enter your message"
                             rows="10"
                             required
-                        >{{ old('subject') }}</textarea>
+                        >{{ old('message') }}</textarea>
                     </div>
                     <div class="form-group">
                         <label>Select Recipients</label>

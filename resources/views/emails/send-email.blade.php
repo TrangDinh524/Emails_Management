@@ -10,7 +10,8 @@
         <h2>{{ $subject }}</h2>
     </div>
     <div class="email-content">
-        {!! nl2br(e($message)) !!}
+        <!-- {!! nl2br(e($message)) !!} -->
+         {{ $body }}
     </div>
     <div class="email-footer"> 
         <p>This email was sent from Email Management System</p>
