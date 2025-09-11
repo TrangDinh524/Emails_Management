@@ -37,7 +37,7 @@
             @endif
 
             @if($emails->count() > 0)
-                <form method="POST" action="{{ route('emails.send-bulk)}}">
+                <form method="POST" action="{{ route('emails.send-email')}}">
                     @csrf
                     <div class="form-group">
                         <label for="subject">Subject</label>
@@ -66,8 +66,8 @@
                         <label>Select Recipients</label>
                         <div class="recipients-container">
                             <div class="recipients-controls">
-                                <button type="button" id="select-all" class="btn btn-secondary">Select All</button>
-                                <button type="button" id="deselect-all" class="btn btn-secondary">Deselect All</button>
+                                <button type="button" id="select-all" class="btn btn-secondary btn-view">Select All</button>
+                                <button type="button" id="deselect-all" class="btn btn-secondary btn-danger">Deselect All</button>
                             </div>
                             <div class="recipients-list">
                                 @foreach($emails as $email)
@@ -75,10 +75,10 @@
                                         <input 
                                             type="checkbox"
                                             name="recipients[]"
-                                            value="{{ $emails->id }}"
-                                            {{ in_array($emails->id, old('recipients', [])) ? 'checked' : '' }}
+                                            value="{{ $email->id }}"
+                                            {{ in_array($email->id, old('recipients', [])) ? 'checked' : '' }}
                                         >
-                                        <span>{{ $emails->email }}</span>
+                                        <span>{{ $email->email }}</span>
                                     </label>
                                 @endforeach
                             </div>

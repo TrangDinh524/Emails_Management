@@ -7,6 +7,10 @@
   --font-weight-semibold: 600;
   --color-white: #f8f9fa;
   --color-light-grey: #6c757d;
+  --error-msg-background: linear-gradient(135deg, #dc3545, #c82333);
+  --warning-msg-background: linear-gradient(135deg, #ffc107, #e0a800);
+  --good-msg-background: linear-gradient(135deg, #28a745, #20c997);
+  --good-msg-background-hover: linear-gradient(135deg, #218838, #1ea085);
 
 }
 
@@ -165,15 +169,28 @@ body {
 .btn-secondary {
     background: var( --color-light-grey);
     color: white;
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: var(--font-weight-semibold);
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
 }
 
 .btn-secondary:hover {
     background: #5a6268;
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+    color: white;
+    text-decoration: none;
 }
 
 .btn-danger {
-    background: #dc3545;
+    background: var(--error-msg-background);
     color: white;
 }
 
@@ -183,12 +200,12 @@ body {
 }
 
 .btn-view {
-    background: #28a745;
+    background: var(--good-msg-background);
     color: white;
 }
 
 .btn-view:hover {
-    background: #218838;
+    background: var(--good-msg-background-hover);
     transform: translateY(-1px);
 }
 
@@ -212,6 +229,29 @@ body {
     box-shadow: var(--soft-shadow)
 }
 
+.compose-email-btn {
+    background: var(--good-msg-background);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: var(--font-weight-semibold);
+    display: inline-block;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+}
+.compose-email-btn:hover{
+    background: var(--good-msg-background-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
 /* Link Styles */
 .back-link {
     color: #667eea;
@@ -225,7 +265,7 @@ body {
     color: #764ba2;
 }
 
-/* Message Styles */
+/* Button Message Styles */
 .success-message {
     background: #d4edda;
     border: 1px solid #c3e6cb;
@@ -234,6 +274,26 @@ body {
     border-radius: 10px;
     margin-bottom: 20px;
     font-weight: var(--font-weight-medium);
+}
+.warning-message {
+    background: var(--warning-msg-background);
+    color: #212529;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(255, 193, 7, 0.2);
+    border-left: 4px solid #e0a800;
+}
+.error-message {
+    background: var(--error-msg-background);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+    border-left: 4px solid #c82333;
 }
 
 .error-container {
@@ -390,4 +450,71 @@ tr:hover {
     font-size: 12px;
     color: var( --color-light-grey);
     text-align: center;
+}
+
+/* Compose View */
+/* Form actions */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+/* Form texarea */
+.form-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+.form-textarea:focus{
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Recipient container */
+.recipients-container {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: var( --color-white);
+}
+.recipient-controls {
+    margin-bottom: 15px;
+    display: flex;
+    gap: 10px
+}
+.recipients-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    background-color: white;
+    padding: 10px;
+}
+.recipient-item {
+    display: flex;
+    align-items: center;
+    margin: 2px 0;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.recipient-item {
+    background-color: var(--color-white);
+}
+.recipient-item input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.1);
+}
+.recipient-item span{
+    flex: 1;
+    font-size: 14px;
 }
