@@ -21,9 +21,9 @@ class BulkEmail extends Mailable
      */
     public function __construct($subject, $message, $recipientEmail)
     {
-        $this->subject = $subject
-        $this->message = $message
-        $this->recipientEmail = $recipientEmail
+        $this->subject = $subject;
+        $this->message = $message;
+        $this->recipientEmail = $recipientEmail;
     }
 
     /**
@@ -42,7 +42,7 @@ class BulkEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.bulk-email',
+            view: 'emails.send-email',
             with: [
                 'message' => $this->message,
                 'recipientEmail' => $this->recipientEmail,

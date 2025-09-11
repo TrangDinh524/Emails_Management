@@ -12,4 +12,4 @@ Route::delete('/emails/{id}', [EmailController::class, 'destroy'])->name('emails
 
 //Email Sending routes
 Route::get('/compose-emails', [EmailController::class, 'showComposeForm'])->name('emails.compose');
-Route::post('/emails/send-bulk', [EmailController::class, 'sendBulkEmail'])->name('emails.send-bulk');
+Route::post('/send-email', [EmailController::class, 'sendBulkEmail'])->name('emails.send-email');
