@@ -12,17 +12,17 @@ use Illuminate\Queue\SerializesModels;
 class BulkEmail extends Mailable
 {
     use Queueable, SerializesModels;
-    public $subject;
-    public $message;
+    public $emailSubject;
+    public $body;
     public $recipientEmail;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($subject, $message, $recipientEmail)
+    public function __construct($emailSubject, $body, $recipientEmail)
     {
-        $this->subject = $subject;
-        $this->message = $message;
+        $this->emailSubject = $emailSubject;
+        $this->body = $body;
         $this->recipientEmail = $recipientEmail;
     }
 
@@ -32,7 +32,7 @@ class BulkEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->subject,
+            subject: $this->emailSubject,
         );
     }
 
@@ -41,10 +41,18 @@ class BulkEmail extends Mailable
      */
     public function content(): Content
     {
+        
+        \Log::info('Email data:', [
+            'emailSubject' => $this->emailSubject,
+            'body' => $this->body,
+            'recipientEmail' => $this->recipientEmail,
+        ]);
+
         return new Content(
             view: 'emails.send-email',
             with: [
-                'message' => $this->message,
+                'subject' => $this->emailSubject,
+                'body' => $this->body,
                 'recipientEmail' => $this->recipientEmail,
             ]
         );
