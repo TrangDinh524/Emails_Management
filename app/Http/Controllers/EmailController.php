@@ -65,7 +65,7 @@ class EmailController extends Controller
         ]);
 
         $subject = $request->subject;
-        $message = $request->message;
+        $emailContent = $request->message;
         $recipientIds = $request->recipients;
 
         $recipients = Email::whereIn('id', $recipientIds)->get();
@@ -74,7 +74,7 @@ class EmailController extends Controller
 
         foreach($recipients as $recipient) {
             try {
-                Mail::to($recipient->email)->send(new BulkEmail($subject, $message, $recipient->email));;
+                Mail::to($recipient->email)->send(new BulkEmail($subject, $emailContent));
                 $sentCount++;
                 Log::info("Email sent successfully to: {$recipient->email}");
             } catch(\Exception $e) {
@@ -82,9 +82,9 @@ class EmailController extends Controller
                 Log::error("Failed to sent message to {$recipient->email}: ".$e->getMessage());
             }
         }
-        $message = "Email sending completed. Sent: {$sentCount}, Failed:{$failedCount}";
+        $statusMessage = "Email sending completed. Sent: {$sentCount}, Failed:{$failedCount}";
         $messageType = $failedCount > 0 ? 'warning' : 'success';
-        return redirect()->route('emails.compose')->with($messageType, $message);
+        return redirect()->route('emails.compose')->with($messageType, $statusMessage);
     }
 }
 
