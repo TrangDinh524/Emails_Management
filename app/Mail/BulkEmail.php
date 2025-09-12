@@ -14,16 +14,14 @@ class BulkEmail extends Mailable
     use Queueable, SerializesModels;
     public $emailSubject;
     public $body;
-    public $recipientEmail;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($emailSubject, $body, $recipientEmail)
+    public function __construct($emailSubject, $body)
     {
         $this->emailSubject = $emailSubject;
         $this->body = $body;
-        $this->recipientEmail = $recipientEmail;
     }
 
     /**
@@ -41,20 +39,11 @@ class BulkEmail extends Mailable
      */
     public function content(): Content
     {
-        
-        \Log::info('Email data:', [
-            'emailSubject' => $this->emailSubject,
-            'body' => $this->body,
-            'recipientEmail' => $this->recipientEmail,
-        ]);
-
         return new Content(
             view: 'emails.send-email',
             with: [
-                'subject' => $this->emailSubject,
-                'body' => $this->body,
-                'recipientEmail' => $this->recipientEmail,
-            ]
+                'content' => $this->body,
+            ],
         );
     }
 
