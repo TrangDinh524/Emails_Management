@@ -61,12 +61,27 @@ class EmailController extends Controller
             'subject'=>'required|string|max:255',
             'message'=>'required|string',
             'recipients'=>'required|array|min:1',
-            'recipients.*'=>'exists:emails,id'
+            'recipients.*'=>'exists:emails,id',
+            'attachments.*'=>'file|max:10240|mimes:pdf,doc,docx,txt,jpg,jpeg,png,gif,zip,rar',
         ]);
 
         $subject = $request->subject;
         $emailContent = $request->message;
         $recipientIds = $request->recipients;
+        $attachments = [];
+
+        if ($request->hasFile('attachments')) {
+            foreach($request->file('attachments') as $file) {
+                $filename = time().'_'.$file->getClientOriginalName();
+                $path = $file->storeAs('email_attachments', $filename, 'public');
+
+                $attachments[] = [
+                    'path'=>storage_path('app/public/'.$path),
+                    'name'=>$file->getClientOriginalName(),
+                    'mime'=>$file->getMimeType()
+                ];
+            }
+        }
 
         $recipients = Email::whereIn('id', $recipientIds)->get();
         $sentCount = 0;
@@ -74,12 +89,18 @@ class EmailController extends Controller
 
         foreach($recipients as $recipient) {
             try {
-                Mail::to($recipient->email)->send(new BulkEmail($subject, $emailContent));
+                Mail::to($recipient->email)->send(new BulkEmail($subject, $emailContent, $attachments));
                 $sentCount++;
                 Log::info("Email sent successfully to: {$recipient->email}");
             } catch(\Exception $e) {
                 $failedCount++;
                 Log::error("Failed to sent message to {$recipient->email}: ".$e->getMessage());
+            }
+        }
+        // Clean up uploaded files after sending
+        foreach ($attachments as $attachment) {
+            if (file_exists($attachment['path'])) {
+                unlink($attachment['path']);
             }
         }
         $statusMessage = "Email sending completed. Sent: {$sentCount}, Failed:{$failedCount}";

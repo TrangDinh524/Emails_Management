@@ -63,6 +63,21 @@
                         >{{ old('message') }}</textarea>
                     </div>
                     <div class="form-group">
+                        <label for="attachments">Attachments (Optional)</label>
+                        <input 
+                            type="file"
+                            id="attachments"
+                            name="attachments[]"
+                            class="form-input"
+                            multiple
+                            accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.zip,.rar"
+                        >
+                        <small class="form-help">
+                            You can select multiple files. Maximun file size: 10MB per file. Allowed types: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG, GIF, ZIP, RAR
+                        </small>
+                        <div id="file-list" class="file-list"></div>
+                    </div>
+                    <div class="form-group">
                         <label>Select Recipients</label>
                         <div class="recipients-container">
                             <div class="recipients-controls">
@@ -112,7 +127,45 @@
         document.getElementById('deselect-all').addEventListener('click', function(){
             const checkboxes=document.querySelectorAll('input[name="recipients[]"]');
             checkboxes.forEach(checkbox=>checkbox.checked=false)
-        });
+        });              
+        document.getElementById('attachments').addEventListener('change', function(e){
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML='';
+
+            if (e.target.files.length > 0) {
+                const fileListTitle = document.createElement('h4');
+                fileListTitle.textContent = 'Selected File';
+                fileList.appendChild(fileListTitle);
+
+                Array.from(e.target.files).forEach((file,index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className="file-item";
+                    fileItem.innerHTML=`
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                    <button type="button" class="remove-file" data-index="${index}">Remove</button>
+
+                    `;
+                    fileList.appendChild(fileItem);
+                })
+                
+                // Handle remove button clicks
+                fileList.querySelectorAll('.remove-file').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        files.splice(index, 1);
+
+                        // Create a new DataTransfer object to update the input
+                        const dataTransfer = new DataTransfer();
+                        files.forEach(f => dataTransfer.items.add(f));
+                        e.target.files = dataTransfer.files;
+
+                        // Trigger change event again to refresh the list
+                        e.target.dispatchEvent(new Event('change'));
+                    });
+                });
+            }
+         });
     </script>
 </body>
 </html>
