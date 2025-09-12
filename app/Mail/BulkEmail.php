@@ -14,14 +14,16 @@ class BulkEmail extends Mailable
     use Queueable, SerializesModels;
     public $emailSubject;
     public $body;
+    public $attachments;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($emailSubject, $body)
+    public function __construct($emailSubject, $body, $attachments=[])
     {
         $this->emailSubject = $emailSubject;
         $this->body = $body;
+        $this->attachments = $attachments;
     }
 
     /**
@@ -54,6 +56,17 @@ class BulkEmail extends Mailable
      */
     public function attachments(): array
     {
-        return [];
+        $attachmentObjects = [];
+        foreach ($this->attachments as $attachment) {
+            if (is_array($attachment) && isset($attachment['path'])) {
+                $attachmentObjects[] = Attachment::fromPath($attachment['path'])
+                ->as($attachment['name'] ?? basename($attachment['path']))
+                ->withMime($attachment['mime'] ?? null);
+            } elseif(is_string($attachment)) {
+                $attachmentObjects[] = Attachment::fromPath($attachment);
+            }
+        }
+
+        return $attachmentObjects;
     }
 }
