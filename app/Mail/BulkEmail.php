@@ -15,13 +15,13 @@ class BulkEmail extends Mailable
     
     public $emailSubject;
     public $body;
-    public $attachmentPath;
+    public $attachmentPaths;
 
-    public function __construct($emailSubject, $body, $attachmentPath = null)
+    public function __construct($emailSubject, $body, $attachmentPaths = [])
     {
         $this->emailSubject = $emailSubject;
         $this->body = $body;
-        $this->attachmentPath = $attachmentPath;
+        $this->attachmentPaths = $attachmentPaths;
     }
 
     public function envelope(): Envelope
@@ -45,8 +45,10 @@ class BulkEmail extends Mailable
     {
         $attachments = [];
         
-        if ($this->attachmentPath && file_exists($this->attachmentPath)) {
-            $attachments[] = Attachment::fromPath($this->attachmentPath);
+        foreach ($this->attachmentPaths as $attachmentPath) {
+            if (file_exists($attachmentPath)) {
+                $attachments[] = Attachment::fromPath($attachmentPath);
+            }
         }
         
         return $attachments;

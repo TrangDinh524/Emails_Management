@@ -68,14 +68,15 @@ class EmailController extends Controller
         $subject = $request->subject;
         $emailContent = $request->message;
         $recipientIds = $request->recipients;
-        $attachmentPath = null;
+        $attachmentPaths = [];
 
         // Handle single file upload
-        if ($request->hasFile('attachment')) {
-            $file = $request->file('attachment');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('attachments'), $filename);
-            $attachmentPath = public_path('attachments/' . $filename);
+        if ($request->hasFile('attachments')) {
+            foreach($request->file('attachments') as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('attachments'), $filename);
+                $attachmentPaths[] = public_path('attachments/' . $filename);
+            }
         }
 
         $recipients = Email::whereIn('id', $recipientIds)->get();
@@ -84,7 +85,7 @@ class EmailController extends Controller
 
         foreach($recipients as $recipient) {
             try {
-                Mail::to($recipient->email)->send(new BulkEmail($subject, $emailContent, $attachmentPath));
+                Mail::to($recipient->email)->send(new BulkEmail($subject, $emailContent, $attachmentPaths));
                 $sentCount++;
                 Log::info("Email sent successfully to: {$recipient->email}");
             } catch(\Exception $e) {
@@ -94,14 +95,13 @@ class EmailController extends Controller
         }
         
         // Clean up uploaded file after sending
-        if ($attachmentPath && file_exists($attachmentPath)) {
-            unlink($attachmentPath);
+        foreach($attachmentPaths as $attachmentPath) {
+            if (file_exists($attachmentPath)) {
+                unlink($attachmentPath);
+            }
         }
         
         $statusMessage = "Email sending completed. Sent: {$sentCount}, Failed: {$failedCount}";
-        if ($attachmentPath) {
-            $statusMessage .= " (with attachment)";
-        }
         
         $messageType = $failedCount > 0 ? 'warning' : 'success';
         return redirect()->route('emails.compose')->with($messageType, $statusMessage);
