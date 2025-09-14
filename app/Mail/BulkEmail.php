@@ -3,32 +3,27 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Queue\SerializesModels;
 
 class BulkEmail extends Mailable
 {
     use Queueable, SerializesModels;
+    
     public $emailSubject;
     public $body;
-    public $attachments;
+    public $attachmentPath;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct($emailSubject, $body, $attachments=[])
+    public function __construct($emailSubject, $body, $attachmentPath = null)
     {
         $this->emailSubject = $emailSubject;
         $this->body = $body;
-        $this->attachments = $attachments;
+        $this->attachmentPath = $attachmentPath;
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -36,9 +31,6 @@ class BulkEmail extends Mailable
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
@@ -49,24 +41,14 @@ class BulkEmail extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
-        $attachmentObjects = [];
-        foreach ($this->attachments as $attachment) {
-            if (is_array($attachment) && isset($attachment['path'])) {
-                $attachmentObjects[] = Attachment::fromPath($attachment['path'])
-                ->as($attachment['name'] ?? basename($attachment['path']))
-                ->withMime($attachment['mime'] ?? null);
-            } elseif(is_string($attachment)) {
-                $attachmentObjects[] = Attachment::fromPath($attachment);
-            }
+        $attachments = [];
+        
+        if ($this->attachmentPath && file_exists($this->attachmentPath)) {
+            $attachments[] = Attachment::fromPath($this->attachmentPath);
         }
-
-        return $attachmentObjects;
+        
+        return $attachments;
     }
 }

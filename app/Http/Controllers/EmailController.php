@@ -62,25 +62,20 @@ class EmailController extends Controller
             'message'=>'required|string',
             'recipients'=>'required|array|min:1',
             'recipients.*'=>'exists:emails,id',
-            'attachments.*'=>'file|max:10240|mimes:pdf,doc,docx,txt,jpg,jpeg,png,gif,zip,rar',
+            'attachment' => 'file|max:10240|mimes:pdf,doc,docx,txt,jpg,jpeg,png,gif,zip,rar',
         ]);
 
         $subject = $request->subject;
         $emailContent = $request->message;
         $recipientIds = $request->recipients;
-        $attachments = [];
+        $attachmentPath = null;
 
-        if ($request->hasFile('attachments')) {
-            foreach($request->file('attachments') as $file) {
-                $filename = time().'_'.$file->getClientOriginalName();
-                $path = $file->storeAs('email_attachments', $filename, 'public');
-
-                $attachments[] = [
-                    'path'=>storage_path('app/public/'.$path),
-                    'name'=>$file->getClientOriginalName(),
-                    'mime'=>$file->getMimeType()
-                ];
-            }
+        // Handle single file upload
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('attachments'), $filename);
+            $attachmentPath = public_path('attachments/' . $filename);
         }
 
         $recipients = Email::whereIn('id', $recipientIds)->get();
@@ -89,23 +84,26 @@ class EmailController extends Controller
 
         foreach($recipients as $recipient) {
             try {
-                Mail::to($recipient->email)->send(new BulkEmail($subject, $emailContent, $attachments));
+                Mail::to($recipient->email)->send(new BulkEmail($subject, $emailContent, $attachmentPath));
                 $sentCount++;
                 Log::info("Email sent successfully to: {$recipient->email}");
             } catch(\Exception $e) {
                 $failedCount++;
-                Log::error("Failed to sent message to {$recipient->email}: ".$e->getMessage());
+                Log::error("Failed to send message to {$recipient->email}: ".$e->getMessage());
             }
         }
-        // Clean up uploaded files after sending
-        foreach ($attachments as $attachment) {
-            if (file_exists($attachment['path'])) {
-                unlink($attachment['path']);
-            }
+        
+        // Clean up uploaded file after sending
+        if ($attachmentPath && file_exists($attachmentPath)) {
+            unlink($attachmentPath);
         }
-        $statusMessage = "Email sending completed. Sent: {$sentCount}, Failed:{$failedCount}";
+        
+        $statusMessage = "Email sending completed. Sent: {$sentCount}, Failed: {$failedCount}";
+        if ($attachmentPath) {
+            $statusMessage .= " (with attachment)";
+        }
+        
         $messageType = $failedCount > 0 ? 'warning' : 'success';
         return redirect()->route('emails.compose')->with($messageType, $statusMessage);
     }
 }
-
