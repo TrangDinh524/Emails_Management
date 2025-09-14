@@ -8,6 +8,8 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BulkEmail;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+use App\Models\EmailStatistic;
 
 class EmailController extends Controller
 {
@@ -94,6 +96,9 @@ class EmailController extends Controller
             }
         }
         
+        // Track email statistic
+        $this->trackEmailStatistic($sentCount, $failedCount);
+
         // Clean up uploaded file after sending
         foreach($attachmentPaths as $attachmentPath) {
             if (file_exists($attachmentPath)) {
@@ -105,5 +110,16 @@ class EmailController extends Controller
         
         $messageType = $failedCount > 0 ? 'warning' : 'success';
         return redirect()->route('emails.compose')->with($messageType, $statusMessage);
+    }
+
+    private function trackEmailStatistic($sentCount, $failedCount)
+    {
+        try {
+            $today = Carbon::today();
+            $statistics = EmailStatistic::getOrCreateForDate($today);
+            $statistics->increamentStats($sentCount + $failedCount, $sentCount, $failedCount);
+        } catch (\Exception $e) {
+            Log::error("Failed to track email statistic: " . $e->getMessage());
+        }
     }
 }
