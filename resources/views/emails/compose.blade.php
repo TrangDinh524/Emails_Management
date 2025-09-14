@@ -64,18 +64,19 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="attachment">Attachment (Optional)</label>
+                        <label for="attachments">Attachments (Optional)</label>
                         <input 
                             type="file"
-                            id="attachment"
-                            name="attachment"
+                            id="attachments"
+                            name="attachments[]"
                             class="form-input"
+                            multiple
                             accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.zip,.rar"
                         >
                         <small class="form-help">
-                            Maximum file size: 10MB. Allowed types: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG, GIF, ZIP, RAR
+                            You can select multiple files. Maximum file size: 10MB per file. Allowed types: PDF, DOC, DOCX, TXT, JPG, JPEG, PNG, GIF, ZIP, RAR
                         </small>
-                        <div id="file-info" class="file-info"></div>
+                        <div id="file-list" class="file-list"></div>
                     </div>
 
                     <div class="form-group">
@@ -130,19 +131,25 @@
             checkboxes.forEach(checkbox=>checkbox.checked=false)
         });              
         
-        // Show file info when selected
-        document.getElementById('attachment').addEventListener('change', function(e){
-            const fileInfo = document.getElementById('file-info');
+        // Show file list when files are selected
+        document.getElementById('attachments').addEventListener('change', function(e){
+            const fileList = document.getElementById('file-list');
+            fileList.innerHTML = '';
+            
             if (e.target.files.length > 0) {
-                const file = e.target.files[0];
-                fileInfo.innerHTML = `
-                    <div class="file-item">
+                const fileListTitle = document.createElement('h4');
+                fileListTitle.textContent = 'Selected Files:';
+                fileList.appendChild(fileListTitle);
+                
+                Array.from(e.target.files).forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.innerHTML = `
                         <span class="file-name">${file.name}</span>
                         <span class="file-size">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                    </div>
-                `;
-            } else {
-                fileInfo.innerHTML = '';
+                    `;
+                    fileList.appendChild(fileItem);
+                });
             }
         });
     </script>
