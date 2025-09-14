@@ -16,9 +16,16 @@
             @if(session('success'))
                 <div class="success-message">{{ session('success') }}</div>
             @endif
-            <a href="{{ route('emails.create')}}" class="add-email-btn">
-                Add New Email 
-            </a>
+            <div class="action-buttons">
+                <a href="{{ route('emails.create')}}" class="add-email-btn">
+                    Add New Email 
+                </a>
+                @if($emails->count() > 0)
+                    <a href="{{ route('emails.compose')}}" class="compose-email-btn">
+                        Send Email 
+                    </a>
+                @endif
+            </div>
 
             @if($emails->count() > 0)
                 <table id="emails-table">
