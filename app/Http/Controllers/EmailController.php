@@ -117,7 +117,7 @@ class EmailController extends Controller
         try {
             $today = Carbon::today();
             $statistics = EmailStatistic::getOrCreateForDate($today);
-            $statistics->increamentStats($sentCount + $failedCount, $sentCount, $failedCount);
+            $statistics->incrementStats($sentCount + $failedCount, $sentCount, $failedCount);
         } catch (\Exception $e) {
             Log::error("Failed to track email statistic: " . $e->getMessage());
         }
