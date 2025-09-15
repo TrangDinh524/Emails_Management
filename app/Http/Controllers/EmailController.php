@@ -57,7 +57,8 @@ class EmailController extends Controller
         $emails = Email::whereNull('deleted_at')->get();
         return view('emails.compose', compact('emails'));
     }
-    public function sendBulkEmail(Request $request)
+
+    public function sendBulkEmailImmediate(Request $request)
     {
         $request->validate([
             'subject'=>'required|string|max:255',
@@ -112,6 +113,53 @@ class EmailController extends Controller
         return redirect()->route('emails.compose')->with($messageType, $statusMessage);
     }
 
+    public function sendBulkEmailByQueue(Request $request)
+    {
+        $request->validate([
+            'subject'=>'required|string|max:255',
+            'message'=>'required|string',
+            'recipients'=>'required|array|min:1',
+            'recipients.*'=>'exists:emails,id',
+            'attachments.*' => 'file|max:10240|mimes:pdf,doc,docx,txt,jpg,jpeg,png,gif,zip,rar',
+        ]);
+
+        $subject = $request->subject;
+        $emailContent = $request->message;
+        $recipientIds = $request->recipients;
+        $attachmentPaths = [];
+
+        // Handle single file upload
+        if ($request->hasFile('attachments')) {
+            foreach($request->file('attachments') as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('attachments'), $filename);
+                $attachmentPaths[] = public_path('attachments/' . $filename);
+            }
+        }
+
+        $recipients = Email::whereIn('id', $recipientIds)->get();
+        $queuedCount = 0;
+
+        foreach($recipients as $recipient) {
+            try {
+                EmailQueue::create([
+                    'email_id' => $recipient->id,
+                    'subject' => $subject,
+                    'email_content' => $emailContent,
+                    'attachments' => $attachmentPaths,
+                    'status' => 'pending',
+                ]);
+                $queuedCount++;
+            } catch(\Exception $e) {
+                Log::error("Failed to queue email for {$recipient->email}: ".$e->getMessage());
+            }
+        }
+        
+        $statusMessage = "Emails queued successfully. {$queuedCount} emails added to queue and will be processed in the background.";
+        
+        return redirect()->route('emails.compose')->with($statusMessage);
+    }
+
     private function trackEmailStatistic($sentCount, $failedCount)
     {
         try {
@@ -121,6 +169,23 @@ class EmailController extends Controller
         } catch (\Exception $e) {
             Log::error("Failed to track email statistic: " . $e->getMessage());
         }
+    }
+
+    public function queueStatus()
+    {
+        $queueStats = [
+            'pending' => EmailQueue::pending()->count(),
+            'processing' => EmailQueue::where('status', 'processing')->count(),
+            'sent' => EmailQueue::where('status', 'sent')->count(),
+            'failed' => EmailQueue::failed()->count(),
+        ];
+
+        $recentEmails = EmailQueue::with('email')
+            ->orderBy('created_at', 'desc')
+            ->limit(20)
+            ->get();
+
+        return view('emails.queue-status', compact('queueStats', 'recentEmails'));
     }
 }
 

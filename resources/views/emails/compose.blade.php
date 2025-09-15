@@ -103,7 +103,11 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="submit-btn" onclick="return confirm('Are you sure you want to send this email?')">Send Email</button>
+                        <div class="mt-3">
+                            <button type="submit" formaction="{{ route('emails.send-email-by-queue') }}" class="btn btn-primary">Send Emails (Queued)</button>
+                            <button type="submit" formaction="{{ route('emails.send-email-immediate') }}" class="btn btn-warning">Send Emails (Immediate)</button>
+                            <a href="{{ route('emails.queue-status') }}" class="btn btn-info">View Queue Status</a>
+                        </div>
                         <a href="{{ route('emails.index')}}" class="abtn btn-secondary">
                             Cancel
                         </a>

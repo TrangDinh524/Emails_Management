@@ -16,6 +16,12 @@ class Kernel extends ConsoleKernel
         $schedule->command('email:send-daily-report')
                  ->dailyAt('17:00')
                  ->timezone('Asia/Ho_Chi_Minh');
+        
+        // Process email queue every 10 seconds
+        $schedule->command('email:process-queue')
+                ->everyTenSeconds()
+                ->withoutOverlapping()
+                ->runInBackground();
     }
 
     /**
