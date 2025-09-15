@@ -10,7 +10,7 @@
     <div class="auto-refresh">Auto-refresh: 10s</div>
     
     <div class="container">
-        <h1>📧 Email Queue Status</h1>
+        <h1>Email Queue Status</h1>
         
         <!-- Queue Statistics -->
         <div class="stats-grid">

@@ -104,7 +104,7 @@
 
                     <div class="form-actions">
                         <div class="mt-3">
-                            <button type="submit" formaction="{{ route('emails.send-email-by-queue') }}" class="btn btn-primary">Send Emails (Queued)</button>
+                            <button type="submit" formaction="{{ route('emails.send-email') }}" class="btn btn-primary">Send Emails (Queued)</button>
                             <button type="submit" formaction="{{ route('emails.send-email-immediate') }}" class="btn btn-warning">Send Emails (Immediate)</button>
                             <a href="{{ route('emails.queue-status') }}" class="btn btn-info">View Queue Status</a>
                         </div>

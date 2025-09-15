@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('subject');
             $table->text('email_content');
             $table->json('attachments')->nullable();
-            $table->string('status', ['pending', 'processing', 'sent', 'failed'])->default('pending');
+            $table->enum('status', ['pending', 'processing', 'sent', 'failed'])->default('pending');
             $table->text('error_message')->nullable();
             $table->integer('retry_count')->default(0);
             $table->timestamp('processed_at')->nullable();

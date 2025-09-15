@@ -12,7 +12,7 @@ Route::delete('/emails/{id}', [EmailController::class, 'destroy'])->name('emails
 
 //Email Sending routes
 Route::get('/compose-emails', [EmailController::class, 'showComposeForm'])->name('emails.compose');
-Route::post('/send-email-by-queue', [EmailController::class, 'sendBulkEmailByQueue'])->name('emails.send-email-by-queue');
+Route::post('/send-email-by-queue', [EmailController::class, 'sendBulkEmailByQueue'])->name('emails.send-email');
 Route::post('/send-email-immediate', [EmailController::class, 'sendBulkEmailImmediate'])->name('emails.send-email-immediate');
 
 // Queue monitoring routes

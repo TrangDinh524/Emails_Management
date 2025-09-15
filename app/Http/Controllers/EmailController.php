@@ -10,6 +10,7 @@ use App\Mail\BulkEmail;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Models\EmailStatistic;
+use App\Models\EmailQueue;
 
 class EmailController extends Controller
 {

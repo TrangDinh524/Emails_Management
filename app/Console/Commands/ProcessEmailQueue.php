@@ -13,7 +13,7 @@ class ProcessEmailQueue extends Command
      *
      * @var string
      */
-    protected $signature = 'email:process-queue {--batch-size=10 : Number of emails to process in each batch}';
+    protected $signature = 'email:process-queue {--batch-size=5 : Number of emails to process in each batch}';
 
     /**
      * The console command description.
@@ -27,17 +27,25 @@ class ProcessEmailQueue extends Command
      */
     public function handle()
     {
-        $batchSize = $this->option('batch-size');
+        try 
+        {
+             \Log::info("Email queue processing job starts.");
+            $batchSize = $this->option('batch-size');
+            $this->info("Processing emails queue with batch size: {$batchSize}");
 
-        $this->info("Processing emails queue with batch size: {$batchSize}");
+            ProcessBatchEmailsJob::dispatch();
 
-        ProcessBatchEmailsJob::dispatch();
+            $this->info("Email queue processing job dispatched successfully.");         
+            \Log::info("Email queue processing job dispatched successfully.");
 
-        $this->info("Email queue processing job dispatched successfully.");
 
-        $pendingCount = EmailQueue::pending()->count();
-        $failedCount = EmailQueue::failed()->count();
+            $pendingCount = EmailQueue::pending()->count();
+            $failedCount = EmailQueue::failed()->count();
 
-        $this->info("Queue Status - Pending: {$pendingCount}, Failed: {$failedCount}");
+            $this->info("Queue Status - Pending: {$pendingCount}, Failed: {$failedCount}");
+        } catch (\Exception $e) {
+            $this->error("Error: " . $e->getMessage());
+        }
+
     }
 }

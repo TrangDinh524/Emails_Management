@@ -29,7 +29,7 @@ class ProcessBatchEmailsJob implements ShouldQueue
         $pendingEmails = EmailQueue::where('status', 'pending')
             ->where('created_at', '<=', Carbon::now()->subMinutes(10))
             -> orderBy('created_at', 'asc')
-            ->limit(10) // Process 50 emails at a time
+            ->limit(5) // Process 10 emails at a time
             ->get();
 
         if ($pendingEmails->isEmpty()) {

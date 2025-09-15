@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class EmailQueue extends Model
 {
+    protected $table = 'email_queue';
+
     protected $fillable = [
         'email_id',
         'subject',
@@ -35,6 +37,13 @@ class EmailQueue extends Model
     {
         return $query->where('status', 'pending');
     }
+
+    
+    public function scopeFailed($query)
+    {
+        return $query->where('status', 'failed');
+    }
+
 
     /**
      * Mark as processing.
