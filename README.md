@@ -78,9 +78,14 @@ A simple and elegant Laravel application for managing email addresses with full 
 
     ```bash
     php artisan serve
+
     ```
 
-    The application will be available at `http://localhost:8000`
+    The application will be available at `http://localhost:8000`. If have errors, run the command below (Port is set to be `9999`):
+    ```bash
+    php -S localhost:9999 -t public
+
+    ```
 
 ## Usage
 
