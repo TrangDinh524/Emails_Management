@@ -98,7 +98,7 @@ class EmailController extends Controller
         
         // Track email statistic
         $this->trackEmailStatistic($sentCount, $failedCount);
-
+      
         // Clean up uploaded file after sending
         foreach($attachmentPaths as $attachmentPath) {
             if (file_exists($attachmentPath)) {
@@ -123,3 +123,4 @@ class EmailController extends Controller
         }
     }
 }
+
