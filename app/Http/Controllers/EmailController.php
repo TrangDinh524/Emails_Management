@@ -64,7 +64,7 @@ class EmailController extends Controller
             'message'=>'required|string',
             'recipients'=>'required|array|min:1',
             'recipients.*'=>'exists:emails,id',
-            'attachment' => 'file|max:10240|mimes:pdf,doc,docx,txt,jpg,jpeg,png,gif,zip,rar',
+            'attachments.*' => 'file|max:10240|mimes:pdf,doc,docx,txt,jpg,jpeg,png,gif,zip,rar',
         ]);
 
         $subject = $request->subject;
