@@ -13,6 +13,7 @@ use App\Models\EmailStatistic;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BulkEmail;
+use App\Models\EmailQueue;
 
 class SendSingleEmailJob implements ShouldQueue
 {
@@ -26,16 +27,18 @@ class SendSingleEmailJob implements ShouldQueue
     public $subject;
     public $emailContent;
     public $attachmentPaths;
+    public $emailQueueId;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($emailId:int, $subject:string, $emailContent:string, $attachmentPaths = [])
+    public function __construct($emailId:int, $subject:string, $emailContent:string, $attachmentPaths = [], $emailQueueId:null)
     {
         $this->emailId = $emailId;
         $this->subject = $subject;
         $this->emailContent = $emailContent;
         $this->attachmentPaths = $attachmentPaths;
+        $this->emailQueueId = $emailQueueId;
     }
 
     /**
@@ -47,14 +50,26 @@ class SendSingleEmailJob implements ShouldQueue
             $email = Email::find($this->emailId);
             if (!$email) {
                 Log::error("Email not found for id: " . $this->emailId);
-                return
+                if ($this->emailQueueId) {
+                    EmailQueue::find($this->emailQueueId)->markAsFailed("Email not found");
+                }
+                return;
             }
             Mail::to($email->email)->send(new BulkEmail($this->subject, $this->emailContent, $this->attachmentPaths));
 
-            // Track successful email
-            $this->trackEmailStatistic(1, 0);
+            if ($this->emailQueueId) {
+                EmailQueue::find($this->emailQueueId)->markAsSent();
+            }
+
+             // Track successful email
+             $this->trackEmailStatistic(1, 0);
+
         } catch (\Exception $e) {
             Log::error("Failed to send email to ID:  {$this->emailId} ". $e->getMessage());
+
+            if ($this->emailQueueId) {
+                EmailQueue::find($this->emailQueueId)->markAsFailed($e->getMessage());
+            }
 
             // Track failed email
             $this->trackEmailStatistic(0, 1);

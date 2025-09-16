@@ -43,10 +43,11 @@ class ProcessBatchEmailsJob implements ShouldQueue
            try {
                 // Dispatch individual email job
                 SendSingleEmailJob::dispatch(
-                    $emailQueue->id, 
+                    $emailQueue->email_id, 
                     $emailQueue->subject, 
                     $emailQueue->email_content, 
-                    $emailQueue->attachments ?? []
+                    $emailQueue->attachments ?? [],
+                    $emailQueue->id
                 );
 
                 $emailQueue->markAsProcessing();
