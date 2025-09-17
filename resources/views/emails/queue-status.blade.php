@@ -37,7 +37,7 @@
             <div class="table-header">
                 <h3>Recent Email Activity</h3>
             </div>
-            <table>
+            <table style="border-collapse: separate; border-spacing: 15px 8px; width: 100%;">
                 <thead>
                     <tr>
                         <th>Email Address</th>

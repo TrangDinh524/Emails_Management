@@ -75,7 +75,7 @@ class EmailController extends Controller
         $recipientIds = $request->recipients;
         $attachmentPaths = [];
 
-        // Handle single file upload
+        // Files upload
         if ($request->hasFile('attachments')) {
             foreach($request->file('attachments') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
@@ -89,11 +89,20 @@ class EmailController extends Controller
         $failedCount = 0;
 
         foreach($recipients as $recipient) {
+            $emailQueue = EmailQueue::create([
+                'email_id' => $recipient->id,
+                'subject' => $subject,
+                'email_content' => $emailContent,
+                'attachments' => $attachmentPaths,
+                'status' => 'processing',
+            ]);
             try {
                 Mail::to($recipient->email)->send(new BulkEmail($subject, $emailContent, $attachmentPaths));
+                $emailQueue->markAsSent();
                 $sentCount++;
                 Log::info("Email sent successfully to: {$recipient->email}");
             } catch(\Exception $e) {
+                $emailQueue->markAsFailed($e->getMessage());
                 $failedCount++;
                 Log::error("Failed to send message to {$recipient->email}: ".$e->getMessage());
             }
@@ -130,7 +139,7 @@ class EmailController extends Controller
         $recipientIds = $request->recipients;
         $attachmentPaths = [];
 
-        // Handle single file upload
+        // Files upload
         if ($request->hasFile('attachments')) {
             foreach($request->file('attachments') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();

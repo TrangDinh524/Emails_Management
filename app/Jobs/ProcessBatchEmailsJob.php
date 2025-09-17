@@ -27,8 +27,7 @@ class ProcessBatchEmailsJob implements ShouldQueue
         Log::info("Start batch email processing ...");
 
         $pendingEmails = EmailQueue::where('status', 'pending')
-            ->where('created_at', '<=', Carbon::now()->subMinutes(10))
-            -> orderBy('created_at', 'asc')
+            ->orderBy('created_at', 'asc')
             ->limit(5) // Process 10 emails at a time
             ->get();
 
@@ -47,7 +46,7 @@ class ProcessBatchEmailsJob implements ShouldQueue
                     $emailQueue->subject, 
                     $emailQueue->email_content, 
                     $emailQueue->attachments ?? [],
-                    $emailQueue->id
+                    $emailQueue->queue_id
                 );
 
                 $emailQueue->markAsProcessing();

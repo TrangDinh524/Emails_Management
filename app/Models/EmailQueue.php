@@ -9,6 +9,8 @@ class EmailQueue extends Model
 {
     protected $table = 'email_queue';
 
+    protected $primaryKey = 'queue_id';
+
     protected $fillable = [
         'email_id',
         'subject',

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('email_queue', function (Blueprint $table) {
-            $table->id();
+            $table->id('queue_id');
             $table->foreignId('email_id')->constrained('emails')->onDelete('cascade');
             $table->string('subject');
             $table->text('email_content');

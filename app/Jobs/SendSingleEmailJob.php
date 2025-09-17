@@ -27,18 +27,18 @@ class SendSingleEmailJob implements ShouldQueue
     public $subject;
     public $emailContent;
     public $attachmentPaths;
-    public $emailQueueId;
+    public $queueId;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($emailId:int, $subject:string, $emailContent:string, $attachmentPaths = [], $emailQueueId:null)
-    {
+    public function __construct($emailId, $subject, $emailContent, $attachmentPaths = [], $queueId = null)
+        {
         $this->emailId = $emailId;
         $this->subject = $subject;
         $this->emailContent = $emailContent;
         $this->attachmentPaths = $attachmentPaths;
-        $this->emailQueueId = $emailQueueId;
+        $this->queueId = $queueId;
     }
 
     /**
@@ -50,15 +50,15 @@ class SendSingleEmailJob implements ShouldQueue
             $email = Email::find($this->emailId);
             if (!$email) {
                 Log::error("Email not found for id: " . $this->emailId);
-                if ($this->emailQueueId) {
-                    EmailQueue::find($this->emailQueueId)->markAsFailed("Email not found");
+                if ($this->queueId) {
+                    EmailQueue::find($this->queueId)->markAsFailed("Email not found");
                 }
                 return;
             }
             Mail::to($email->email)->send(new BulkEmail($this->subject, $this->emailContent, $this->attachmentPaths));
 
-            if ($this->emailQueueId) {
-                EmailQueue::find($this->emailQueueId)->markAsSent();
+            if ($this->queueId) {
+                EmailQueue::find($this->queueId)->markAsSent();
             }
 
              // Track successful email
@@ -67,8 +67,8 @@ class SendSingleEmailJob implements ShouldQueue
         } catch (\Exception $e) {
             Log::error("Failed to send email to ID:  {$this->emailId} ". $e->getMessage());
 
-            if ($this->emailQueueId) {
-                EmailQueue::find($this->emailQueueId)->markAsFailed($e->getMessage());
+            if ($this->queueId) {
+                EmailQueue::find($this->queueId)->markAsFailed($e->getMessage());
             }
 
             // Track failed email
