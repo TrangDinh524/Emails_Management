@@ -26,7 +26,7 @@ class EmailController extends Controller
                 'email' => [
                     'required',
                     'email',
-                    Rule::unique('emails')->whereNull('deleted_at'),
+                    Rule::unique('emails'),
                 ],
             ]);
 
@@ -38,7 +38,7 @@ class EmailController extends Controller
 
     public function index()
     {
-        $emails = Email::whereNull('deleted_at')->paginate(10);
+        $emails = Email::paginate(10);
         return view('emails.index', compact('emails'));
     }
     public function show($id)
@@ -55,7 +55,7 @@ class EmailController extends Controller
     }
     public function showComposeForm()
     {
-        $emails = Email::whereNull('deleted_at')->get();
+        $emails = Email::get();
         return view('emails.compose', compact('emails'));
     }
 
