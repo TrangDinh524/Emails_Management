@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Models\EmailStatistic;
 use App\Models\EmailQueue;
+use Illuminate\Support\Facades\Storage;
 
 class EmailController extends Controller
 {
@@ -78,8 +79,8 @@ class EmailController extends Controller
         if ($request->hasFile('attachments')) {
             foreach($request->file('attachments') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('attachments'), $filename);
-                $attachmentPaths[] = public_path('attachments/' . $filename);
+                $path = $file->storeAs('attachments', $filename);
+                $attachmentPaths[] = Storage::path($path);
             }
         }
 
@@ -133,8 +134,8 @@ class EmailController extends Controller
         if ($request->hasFile('attachments')) {
             foreach($request->file('attachments') as $file) {
                 $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('attachments'), $filename);
-                $attachmentPaths[] = public_path('attachments/' . $filename);
+                $path = $file->storeAs('attachments', $filename);
+                $attachmentPaths[] = Storage::path($path);
             }
         }
 
