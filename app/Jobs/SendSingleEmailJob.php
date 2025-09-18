@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\Models\Email;
 use App\Models\EmailStatistic;
 use Carbon\Carbon;
@@ -47,22 +48,27 @@ class SendSingleEmailJob implements ShouldQueue
     public function handle(): void
     {
         try {
-            $email = Email::find($this->emailId);
-            if (!$email) {
-                Log::error("Email not found for id: " . $this->emailId);
-                if ($this->queueId) {
-                    EmailQueue::find($this->queueId)->markAsFailed("Email not found");
+            DB::transaction(function () {
+                
+                $email = Email::find($this->emailId);
+                if (!$email) {
+                    Log::error("Email not found for id: " . $this->emailId);
+                    if ($this->queueId) {
+                        EmailQueue::find($this->queueId)->markAsFailed("Email not found");
+                    }
+                    return;
                 }
-                return;
-            }
-            Mail::to($email->email)->send(new BulkEmail($this->subject, $this->emailContent, $this->attachmentPaths));
+                Mail::to($email->email)->send(new BulkEmail($this->subject, $this->emailContent, $this->attachmentPaths));
 
-            if ($this->queueId) {
-                EmailQueue::find($this->queueId)->markAsSent();
-            }
+                if ($this->queueId) {
+                    EmailQueue::find($this->queueId)->markAsSent();
+                }
 
-             // Track successful email
-             $this->trackEmailStatistic(1, 0);
+                // Track successful email
+                $this->trackEmailStatistic(1, 0);
+
+                Log::info("Email sent successfully to: {$email->email}");
+            });
 
         } catch (\Exception $e) {
             Log::error("Failed to send email to ID:  {$this->emailId} ". $e->getMessage());

@@ -80,17 +80,17 @@
         
         <div class="stat-item">
             <span class="stat-label">Total Emails Sent: </span>
-            <span class="stat-value">{{ $statistics->total_emails_sent }}</span>
+            <span class="stat-value"> {{ $statistics->total_emails_sent }}</span>
         </div>
         
         <div class="stat-item">
             <span class="stat-label">Successful Emails: </span>
-            <span class="stat-value">{{ $statistics->successful_emails }}</span>
+            <span class="stat-value"> {{ $statistics->successful_emails }}</span>
         </div>
         
         <div class="stat-item">
             <span class="stat-label">Failed Emails: </span>
-            <span class="stat-value">{{ $statistics->failed_emails }}</span>
+            <span class="stat-value"> {{ $statistics->failed_emails }}</span>
         </div>
     </div>
 

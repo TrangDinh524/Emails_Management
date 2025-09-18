@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use App\Models\EmailStatistic;
 use App\Models\EmailQueue;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class EmailController extends Controller
 {
@@ -88,28 +89,45 @@ class EmailController extends Controller
         $sentCount = 0;
         $failedCount = 0;
 
-        foreach($recipients as $recipient) {
-            $emailQueue = EmailQueue::create([
-                'email_id' => $recipient->id,
-                'subject' => $subject,
-                'email_content' => $emailContent,
-                'attachments' => $attachmentPaths,
-                'status' => 'processing',
-            ]);
-            try {
-                Mail::to($recipient->email)->send(new BulkEmail($subject, $emailContent, $attachmentPaths));
-                $emailQueue->markAsSent();
-                $sentCount++;
-                Log::info("Email sent successfully to: {$recipient->email}");
-            } catch(\Exception $e) {
-                $emailQueue->markAsFailed($e->getMessage());
-                $failedCount++;
-                Log::error("Failed to send message to {$recipient->email}: ".$e->getMessage());
+        try {
+            DB::transaction(function () use ($recipients, $subject, $emailContent, $attachmentPaths, &$sentCount, &$failedCount) {
+                foreach($recipients as $recipient) {
+                    $emailQueue = EmailQueue::create([
+                        'email_id' => $recipient->id,
+                        'subject' => $subject,
+                        'email_content' => $emailContent,
+                        'attachments' => $attachmentPaths,
+                        'status' => 'processing',
+                    ]);
+                    try {
+                        Mail::to($recipient->email)->send(new BulkEmail($subject, $emailContent, $attachmentPaths));
+                        $emailQueue->markAsSent();
+                        $sentCount++;
+                        Log::info("Email sent successfully to: {$recipient->email}");
+                    } catch(\Exception $e) {
+                        $emailQueue->markAsFailed($e->getMessage());
+                        $failedCount++;
+                        Log::error("Failed to send message to {$recipient->email}: ".$e->getMessage());
+                    }
+                }
+
+                // Track email statistic
+                $this->trackEmailStatistic($sentCount, $failedCount);
+            });
+        } catch (\Exception $e) {
+            Log::error("Database transaction failed: " . $e->getMessage());
+            $statusMessage = "Email sending failed due to database error: " . $e->getMessage();
+            $messageType = 'error';
+            
+            // Clean up uploaded files on transaction failure
+            foreach($attachmentPaths as $attachmentPath) {
+                if (file_exists($attachmentPath)) {
+                    unlink($attachmentPath);
+                }
             }
+            
+            return redirect()->route('emails.compose')->with($messageType, $statusMessage);
         }
-        
-        // Track email statistic
-        $this->trackEmailStatistic($sentCount, $failedCount);
       
         // Clean up uploaded file after sending
         foreach($attachmentPaths as $attachmentPath) {
@@ -119,7 +137,6 @@ class EmailController extends Controller
         }
         
         $statusMessage = "Email sending completed. Sent: {$sentCount}, Failed: {$failedCount}";
-        
         $messageType = $failedCount > 0 ? 'warning' : 'success';
         return redirect()->route('emails.compose')->with($messageType, $statusMessage);
     }
@@ -151,19 +168,35 @@ class EmailController extends Controller
         $recipients = Email::whereIn('id', $recipientIds)->get();
         $queuedCount = 0;
 
-        foreach($recipients as $recipient) {
-            try {
-                EmailQueue::create([
-                    'email_id' => $recipient->id,
-                    'subject' => $subject,
-                    'email_content' => $emailContent,
-                    'attachments' => $attachmentPaths,
-                    'status' => 'pending',
-                ]);
-                $queuedCount++;
-            } catch(\Exception $e) {
-                Log::error("Failed to queue email for {$recipient->email}: ".$e->getMessage());
+        try {
+            DB::transaction(function () use ($recipients, $subject, $emailContent, $attachmentPaths, &$queuedCount) {
+                foreach($recipients as $recipient) {
+                    try {
+                        EmailQueue::create([
+                            'email_id' => $recipient->id,
+                            'subject' => $subject,
+                            'email_content' => $emailContent,
+                            'attachments' => $attachmentPaths,
+                            'status' => 'pending',
+                        ]);
+                        $queuedCount++;
+                    } catch(\Exception $e) {
+                        Log::error("Failed to queue email for {$recipient->email}: ".$e->getMessage());
+                    }
+                }
+            });
+        } catch (\Exception $e) {
+            Log::error("Database transaction failed for email queuing: " . $e->getMessage());
+            $statusMessage = "Email queuing failed due to database error: " . $e->getMessage();
+            
+            // Clean up uploaded files on transaction failure
+            foreach($attachmentPaths as $attachmentPath) {
+                if (file_exists($attachmentPath)) {
+                    unlink($attachmentPath);
+                }
             }
+            
+            return redirect()->route('emails.compose')->with('error', $statusMessage);
         }
         
         $statusMessage = "Emails queued successfully. {$queuedCount} emails added to queue and will be processed in the background.";
